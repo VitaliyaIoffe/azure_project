@@ -92,13 +92,13 @@ namespace Wpf_Lab2A
 		private void CanExecuteEqualsElement(object sender, CanExecuteRoutedEventArgs e)
 		{
 
-			if (Validation.GetHasError(SetH))
+			if (ModelList.SelectedItem != null)
 			{
-				e.CanExecute = false;
+				e.CanExecute = true;
 			}
 			else
 			{
-				e.CanExecute = true;
+				e.CanExecute = false;
 			}
 		}
 		private void ExecutedAddElement(object sender, ExecutedRoutedEventArgs e)
