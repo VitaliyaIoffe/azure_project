@@ -5,43 +5,120 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.DataVisualization.Charting;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Lab_2A;
+using System.Drawing;
+using System.Windows.Forms.Design;
 using System.IO;
 using Microsoft.Win32;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Windows.Forms.DataVisualization.Charting;
 
 namespace Wpf_Lab2A
 {
 	/// <summary>
 	/// Логика взаимодействия для MainWindow.xaml
 	/// </summary>
+	
 	public partial class MainWindow : Window
 	{
+		double Function(double x, double p1, double p2)
+		{
+			return x * p1 * p2;
+		}
+		Chart chart = new Chart();
+
+		public static RoutedCommand AddElement = new RoutedCommand();
+		public static RoutedCommand DrawSelectedCommand = new RoutedCommand();
+		public static RoutedCommand DrawEqualsCommand = new RoutedCommand();
 		public MainWindow()
 		{
 			DataContext = new ObservableModelData();
 			InitializeComponent();
-			LoadLineChartData();
+			winFormsHost.Child = chart;
 		}
-		private void LoadLineChartData()
+		private void ExecutedDrawElement(object sender, ExecutedRoutedEventArgs e)
 		{
-			((LineSeries)mcChart.Series[0]).ItemsSource =
-				new KeyValuePair<DateTime, int>[]{
-			new KeyValuePair<DateTime, int>(DateTime.Now, 100),
-			new KeyValuePair<DateTime, int>(DateTime.Now.AddMonths(1), 130),
-			new KeyValuePair<DateTime, int>(DateTime.Now.AddMonths(2), 150),
-			new KeyValuePair<DateTime, int>(DateTime.Now.AddMonths(3), 125),
-			new KeyValuePair<DateTime, int>(DateTime.Now.AddMonths(4), 155) };
+			chart.Series.Clear();
+			chart.ChartAreas.Add(new ChartArea());
+			chart.Series.Add("Series" + chart.Series.Count.ToString());
+			chart.Series[chart.Series.Count - 1].Points.DataBindXY((ModelList.SelectedItem as ModelData).getX, (ModelList.SelectedItem as ModelData).getValue);
+			chart.Series[chart.Series.Count - 1].ChartType = SeriesChartType.Spline;
+			chart.Series[chart.Series.Count - 1].MarkerStyle = MarkerStyle.Square;
+			chart.Series[chart.Series.Count - 1].MarkerSize = 5;
+			chart.Series[chart.Series.Count - 1].Color = Color.Red;
+			chart.Legends.Add("Legend" + chart.Legends.Count.ToString());
+			chart.Series[chart.Series.Count - 1].LegendText = "P1 = " + (ModelList.SelectedItem as ModelData).getP1.ToString() + " P2 = " + (ModelList.SelectedItem as ModelData).getP2.ToString();
+			for (int j = 0; j < chart.Series[chart.Series.Count - 1].Points.Count; j++)
+				chart.Series[chart.Series.Count - 1].Points[j].Label =
+				chart.Series[chart.Series.Count - 1].Points[j].YValues[0].ToString("F3");
 		}
 
+		private void CanExecuteAddElement(object sender, CanExecuteRoutedEventArgs e)
+		{
+			
+			if (Validation.GetHasError(SetH))
+			{
+				e.CanExecute = false;
+			}
+			else
+			{
+				e.CanExecute = true;
+			}
+		}
+		private void ExecutedEqualsElement(object sender, ExecutedRoutedEventArgs e)
+		{
+			chart.Series.Clear();
+			foreach (var item in (DataContext as ObservableModelData).SubsetP1((ModelList.SelectedItem as ModelData)))
+			{
+				chart.ChartAreas.Add(new ChartArea());
+				chart.Series.Add("Series" + chart.Series.Count.ToString());
+				chart.Series[chart.Series.Count - 1].Points.DataBindXY(item.getX, item.getValue);
+				chart.Series[chart.Series.Count - 1].ChartType = SeriesChartType.Spline;
+				chart.Series[chart.Series.Count - 1].Color = Color.Red;
+				chart.Legends.Add("Legend" + chart.Legends.Count.ToString());
+				chart.Series[chart.Series.Count - 1].LegendText = " P2 = " + item.getP2.ToString();
+				for (int j = 0; j < chart.Series[chart.Series.Count - 1].Points.Count; j++)
+					chart.Series[chart.Series.Count - 1].Points[j].Label =
+					chart.Series[chart.Series.Count - 1].Points[j].YValues[0].ToString("F3");
+			}
+		}
+
+		private void CanExecuteEqualsElement(object sender, CanExecuteRoutedEventArgs e)
+		{
+
+			if (Validation.GetHasError(SetH))
+			{
+				e.CanExecute = false;
+			}
+			else
+			{
+				e.CanExecute = true;
+			}
+		}
+		private void ExecutedAddElement(object sender, ExecutedRoutedEventArgs e)
+		{
+			String[] p = SetP.Text.Split(',');
+			(DataContext as ObservableModelData).Add(new ModelData(Convert.ToInt32(SetH.Text), Convert.ToDouble(p[0]), Convert.ToDouble(p[1]), Function));
+		}
+	
+		private void CanExecuteDrawElement(object sender, CanExecuteRoutedEventArgs e)
+		{
+
+			if (ModelList.SelectedItem != null)
+			{
+				e.CanExecute = true;
+			}
+			else
+			{
+				e.CanExecute = false;
+			}
+		}
 		private void New_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
 			try
@@ -122,6 +199,10 @@ namespace Wpf_Lab2A
 		{
 			e.CanExecute = (DataContext as ObservableModelData).isChange;
 		}
-		
+
+		private void SetP_MouseEnter(object sender, MouseEventArgs e)
+		{
+			SetP.Text = null;
+		}
 	}
 }

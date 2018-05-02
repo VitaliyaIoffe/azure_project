@@ -21,7 +21,7 @@ namespace Lab_2A
 				change = value;
 			}
 		}
-		IEnumerable<ModelData> SubsetP1(ModelData md)
+		public IEnumerable<ModelData> SubsetP1(ModelData md)
 		{
 			return from item in base.Items where item.getP1 == md.getP1 select item;
 		}

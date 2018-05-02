@@ -13,50 +13,54 @@ xmlns:DVC="clr-namespace:System.Windows.Controls.DataVisualization.Charting;asse
 		<CommandBinding Command="ApplicationCommands.Save" Executed="Save_Executed" CanExecute="CanSave_Execute"></CommandBinding>
 		<CommandBinding Command="ApplicationCommands.Open" Executed="Open_Executed"></CommandBinding>
 		<CommandBinding Command="ApplicationCommands.Delete" Executed="Delete_Executed" CanExecute="CanDelete_Execute"></CommandBinding>
-	</Window.CommandBindings>
+		<CommandBinding Command="{x:Static local:MainWindow.AddElement}" Executed="ExecutedAddElement" CanExecute="CanExecuteAddElement" />
+		<CommandBinding Command="{x:Static local:MainWindow.DrawSelectedCommand}" Executed="ExecutedDrawElement" CanExecute="CanExecuteAddElement" />
+		<CommandBinding Command="{x:Static local:MainWindow.DrawEqualsCommand}" Executed="ExecutedEqualsElement" CanExecute="CanExecuteEqualsElement" />
+	</Window.CommandBindings> 
 	<Grid>
-		<TextBox HorizontalAlignment="Left" Height="23" Margin="109,113,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120"/>
-		<TextBox HorizontalAlignment="Left" Height="23" Margin="109,71,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120"/>
-		<ListBox Name="ModelList" HorizontalAlignment="Left" Height="174" Margin="109,176,0,0" VerticalAlignment="Top" Width="120"/>
-		<DVC:Chart Canvas.Top="80" Canvas.Left="10" Name="mcChart" 
-           Width="400" Height="250"
-           Background="LightSteelBlue">
-			<DVC:Chart.Series>
-				<DVC:LineSeries Title=" Monthly Count" 
-    		IndependentValueBinding="{Binding Path=Key}"
-    		DependentValueBinding="{Binding Path=Value}">
-				</DVC:LineSeries>
-			</DVC:Chart.Series>
-		</DVC:Chart>
+		<WindowsFormsHost Name ="winFormsHost"
+                          HorizontalAlignment="Stretch"  Margin="322,139,67,10" 
+                          VerticalAlignment="Stretch" />
+		<TextBox Name="SetP" HorizontalAlignment="Left" Height="23" Margin="109,113,0,0" TextWrapping="Wrap" MouseEnter="SetP_MouseEnter" Text="Введите значение p1,p2 через запятую" VerticalAlignment="Top" Width="120"/>
+		<TextBox Name="SetH" HorizontalAlignment="Left" Height="23" Margin="109,71,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="120">
+			<TextBox.Text>
+				<Binding Path="h">
+					<Binding.ValidationRules>
+						<DataErrorValidationRule />
+					</Binding.ValidationRules>
+				</Binding>
+			</TextBox.Text>
+		</TextBox>
+		<ListBox Name="ModelList" ItemsSource="{Binding Path=.}" HorizontalAlignment="Left" Height="174" Margin="109,176,0,0" VerticalAlignment="Top" Width="120"/>
 		<Menu HorizontalAlignment="Left" Height="21" VerticalAlignment="Top" Width="200">
 			<MenuItem Header="File">
-				<MenuItem Header="New"></MenuItem>
-				<MenuItem Header="Open"></MenuItem>
-				<MenuItem Header="Save"></MenuItem>
+				<MenuItem Command="ApplicationCommands.New" Header="New"></MenuItem>
+				<MenuItem Command="ApplicationCommands.Open" Header="Open"></MenuItem>
+				<MenuItem Command="ApplicationCommands.Save" Header="Save"></MenuItem>
 			</MenuItem>
 			<MenuItem Header="Edit">
-				<MenuItem Header="Add"></MenuItem>
+				<MenuItem Command="{x:Static local:MainWindow.AddElement}" Header="Add"></MenuItem>
 				<MenuItem Header="Remove"></MenuItem>
 			</MenuItem>
 			<MenuItem Header="Draw">
-				<MenuItem Header="DrawSelected"></MenuItem>
-				<MenuItem Header="DrawEquals"></MenuItem>
+				<MenuItem  Command="{x:Static local:MainWindow.DrawSelectedCommand}" Header="DrawSelected"></MenuItem>
+				<MenuItem Command="{x:Static local:MainWindow.DrawEqualsCommand}" Header="DrawEquals"></MenuItem>
 			</MenuItem>
 			<DocumentViewer/>
 		</Menu>
 		<ToolBarTray HorizontalAlignment="Left" Height="25" Margin="229,-4,0,0" VerticalAlignment="Top" Width="100">
 			<ToolBar Margin="0,0,-153,0">
 				<Button Command="ApplicationCommands.New">New</Button>
-				<Button Width="40">Open</Button>
-				<Button Width="60">Save</Button>
+				<Button Command="ApplicationCommands.Open" Width="40">Open</Button>
+				<Button Command="ApplicationCommands.Save" Width="60">Save</Button>
 			</ToolBar>
 			<ToolBar Margin="0,0,-22,0">
-				<Button>Add</Button>
+				<Button Command="{x:Static local:MainWindow.AddElement}">Add</Button>
 				<Button>Remove</Button>
 			</ToolBar>
 			<ToolBar Margin="0,0,-17,0">
-				<Button>DrawSelected</Button>
-				<Button>DrawEquals</Button>
+				<Button Command="{x:Static local:MainWindow.DrawSelectedCommand}" >DrawSelected</Button>
+				<Button Command="{x:Static local:MainWindow.DrawEqualsCommand}">DrawEquals</Button>
 			</ToolBar>
 		</ToolBarTray>
 	</Grid>
